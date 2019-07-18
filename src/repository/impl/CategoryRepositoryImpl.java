@@ -1,10 +1,13 @@
 package repository.impl;
 
+import exc.CategoryNotFoundException;
 import io.IOUtil;
 import model.Category;
+import model.base.AbstractIdentifiable;
 import repository.CategoryRepository;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class CategoryRepositoryImpl implements CategoryRepository {
@@ -12,23 +15,44 @@ public class CategoryRepositoryImpl implements CategoryRepository {
     private static final String FILE_PATH = "";
 
     @Override
-    public List<Category> findAll() throws Throwable {
-        return null;
+    public List<Category> findAll() {
+        return categories();
     }
 
     @Override
-    public void delete(Long aLong) throws Throwable {
-
+    public void delete(Long id) throws CategoryNotFoundException {
+        Category category = findById(id);
+        List<Category> categories = categories();
+        categories.remove(category);
+        List<String[]> data = objToArray(categories);
+        IOUtil.write(data, FILE_PATH);
     }
 
     @Override
-    public Category findById(Long aLong) throws Throwable {
-        return null;
+    public Category findById(Long id) throws CategoryNotFoundException {
+        return categories().stream()
+                .filter(c -> c.getId().equals(id)).findAny().orElseThrow(() -> new CategoryNotFoundException(id));
     }
 
     @Override
-    public Category save(Category category) {
-        return null;
+    public Category save(Category category) throws CategoryNotFoundException {
+        List<Category> categories = categories();
+        if (category.isNew()) {
+            if (categories.size() != 0) {
+                categories.sort(Comparator.comparing(AbstractIdentifiable::getId));
+                Long lastId = categories.get(categories.size() - 1).getId();
+                category.setId(lastId + 1);
+            } else category.setId(1L);
+            categories.add(category);
+        } else {
+            Category old = findById(category.getId());
+            int index = categories.indexOf(old);
+            categories.set(index, category);
+        }
+        List<String[]> data = objToArray(categories);
+        IOUtil.write(data, FILE_PATH);
+
+        return category;
     }
 
     private List<Category> categories() {

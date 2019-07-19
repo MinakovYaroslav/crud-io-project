@@ -1,4 +1,4 @@
-package model.base;
+package com.minakov.crudioproject.model.base;
 
 public class AbstractIdentifiable {
 
@@ -14,5 +14,9 @@ public class AbstractIdentifiable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public boolean isNew() {
+        return id == null;
     }
 }

@@ -18,6 +18,12 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     private static final String FILE_PATH = "";
 
+    private List<Project> projects;
+
+    public ProjectRepositoryImpl() {
+        this.projects = projects();
+    }
+
     @Override
     public List<Project> findAll() {
         return projects();
@@ -26,7 +32,6 @@ public class ProjectRepositoryImpl implements ProjectRepository {
     @Override
     public void delete(Long id) throws ProjectNotFoundException {
         Project project = findById(id);
-        List<Project> projects = projects();
         projects.remove(project);
         List<String[]> data = objToArray(projects);
         IOUtil.write(data, FILE_PATH);
@@ -34,13 +39,12 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public Project findById(Long id) throws ProjectNotFoundException {
-        return projects().stream()
+        return projects.stream()
                 .filter(p -> p.getId().equals(id)).findAny().orElseThrow(() -> new ProjectNotFoundException(id));
     }
 
     @Override
     public Project save(Project project) throws ProjectNotFoundException {
-        List<Project> projects = projects();
         if (project.isNew()) {
             long lastId = projects.stream().mapToLong(AbstractIdentifiable::getId).max().getAsLong();
             project.setId(lastId + 1);

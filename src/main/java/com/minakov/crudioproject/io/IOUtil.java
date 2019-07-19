@@ -19,7 +19,7 @@ public class IOUtil {
                 records.add(line.split(";"));
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Reading file error: " + e);
         }
         return records;
     }
@@ -34,7 +34,7 @@ public class IOUtil {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            System.err.println("Writing file error: " + e);
         }
     }
 }

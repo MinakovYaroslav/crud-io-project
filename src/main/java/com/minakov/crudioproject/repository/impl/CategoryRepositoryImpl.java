@@ -1,10 +1,10 @@
-package repository.impl;
+package com.minakov.crudioproject.repository.impl;
 
-import exc.CategoryNotFoundException;
-import io.IOUtil;
-import model.Category;
-import model.base.AbstractIdentifiable;
-import repository.CategoryRepository;
+import com.minakov.crudioproject.exc.CategoryNotFoundException;
+import com.minakov.crudioproject.io.IOUtil;
+import com.minakov.crudioproject.model.Category;
+import com.minakov.crudioproject.model.base.AbstractIdentifiable;
+import com.minakov.crudioproject.repository.CategoryRepository;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -72,7 +72,7 @@ public class CategoryRepositoryImpl implements CategoryRepository {
         for (Category category : categories) {
             String id = String.valueOf(category.getId());
             String name = category.getName();
-            data.add(new String[] {id, name});
+            data.add(new String[]{id, name});
         }
         return data;
     }

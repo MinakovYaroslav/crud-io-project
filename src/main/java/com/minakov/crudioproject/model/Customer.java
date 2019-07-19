@@ -1,6 +1,6 @@
-package model;
+package com.minakov.crudioproject.model;
 
-import model.base.AbstractIdentifiable;
+import com.minakov.crudioproject.model.base.AbstractIdentifiable;
 
 public class Customer extends AbstractIdentifiable {
 

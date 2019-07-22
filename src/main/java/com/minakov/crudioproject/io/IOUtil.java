@@ -1,38 +1,30 @@
 package com.minakov.crudioproject.io;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.nio.file.StandardOpenOption;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class IOUtil {
 
     public static List<String[]> read(String path) {
-        List<String[]> records = new ArrayList<>();
-        try (BufferedReader reader = Files.newBufferedReader(Paths.get(path))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                records.add(line.split(";"));
-            }
+        try {
+            return Files.lines(Paths.get(path)).map(l -> l.split(";")).collect(Collectors.toList());
         } catch (IOException e) {
             System.err.println("Reading file error: " + e);
         }
-        return records;
+        return Collections.emptyList();
     }
 
     public static void write(List<String[]> data, String path) {
         try {
-            Path p = Paths.get(path);
-            Path tempFile = Files.createTempFile(p.getParent(), "temp", ".txt");
-            try (BufferedWriter writer = Files.newBufferedWriter(tempFile)) {
-                for (String[] fields : data) {
-                    writer.write(String.join(";", fields));
-                }
-            }
+            Files.write(Paths.get(path), data.stream()
+                    .map(f -> String.join(";", f))
+                    .collect(Collectors.toList()), StandardCharsets.UTF_8, StandardOpenOption.CREATE);
         } catch (IOException e) {
             System.err.println("Writing file error: " + e);
         }

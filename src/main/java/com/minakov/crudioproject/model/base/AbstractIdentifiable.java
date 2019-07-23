@@ -6,6 +6,9 @@ public class AbstractIdentifiable {
         this.id = id;
     }
 
+    public AbstractIdentifiable() {
+    }
+
     private Long id;
 
     public Long getId() {
@@ -18,5 +21,10 @@ public class AbstractIdentifiable {
 
     public boolean isNew() {
         return id == null;
+    }
+
+    @Override
+    public String toString() {
+        return "id: " + id;
     }
 }

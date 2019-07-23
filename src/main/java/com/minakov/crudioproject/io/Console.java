@@ -1,17 +1,22 @@
 package com.minakov.crudioproject.io;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.util.Scanner;
 
 public class Console {
 
-    public static String input() {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(System.in))) {
-            return reader.readLine();
-        } catch (IOException e) {
-            System.err.println("Console input error: " + e);
+    private static Scanner s = new Scanner(System.in);
+
+    public static String inputLine() {
+        return s.nextLine();
+    }
+
+    public static void close() {
+        if (s != null) {
+            s.close();
         }
-        return "";
+    }
+
+    public static Long inputLong() {
+        return s.nextLong();
     }
 }

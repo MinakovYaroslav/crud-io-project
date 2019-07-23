@@ -22,6 +22,13 @@ public class Project extends AbstractIdentifiable {
         this.customer = customer;
     }
 
+    public Project(String name, ProjectStatus status, Set<Category> categories, Customer customer) {
+        this.name = name;
+        this.status = status;
+        this.categories = categories;
+        this.customer = customer;
+    }
+
     public String getName() {
         return name;
     }
@@ -52,5 +59,10 @@ public class Project extends AbstractIdentifiable {
 
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + ", name: " + name + ", categories: " + categories + ", customer: [" + customer.toString() + "]";
     }
 }

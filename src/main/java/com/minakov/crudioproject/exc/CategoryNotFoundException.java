@@ -2,14 +2,16 @@ package com.minakov.crudioproject.exc;
 
 public class CategoryNotFoundException extends Throwable {
 
-    private Long categoryId;
+    private String message;
 
-    public CategoryNotFoundException(Long categoryId) {
-        this.categoryId = categoryId;
+    public CategoryNotFoundException(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
-        return "Category with id " + categoryId + " not found";
+        return message;
     }
+
+
 }

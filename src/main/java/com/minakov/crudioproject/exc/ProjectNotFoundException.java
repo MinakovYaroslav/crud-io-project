@@ -2,14 +2,14 @@ package com.minakov.crudioproject.exc;
 
 public class ProjectNotFoundException extends Throwable {
 
-    private Long projectId;
+    private String message;
 
-    public ProjectNotFoundException(Long projectId) {
-        this.projectId = projectId;
+    public ProjectNotFoundException(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
-        return "Project with id " + projectId + " not found";
+        return message;
     }
 }

@@ -2,14 +2,14 @@ package com.minakov.crudioproject.exc;
 
 public class CustomerNotFoundException extends Throwable {
 
-    private Long customerId;
+    private String message;
 
-    public CustomerNotFoundException(Long customerId) {
-        this.customerId = customerId;
+    public CustomerNotFoundException(String message) {
+        this.message = message;
     }
 
     @Override
     public String toString() {
-        return "Customer with id " + customerId + " not found";
+        return message;
     }
 }

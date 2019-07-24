@@ -7,51 +7,62 @@ import com.minakov.crudioproject.model.base.AbstractIdentifiable;
 import com.minakov.crudioproject.repository.CategoryRepository;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 public class CategoryRepositoryImpl implements CategoryRepository {
 
-    private static final String FILE_PATH = "";
+    private static final String FILE_PATH = "C:\\projects\\crud-io-project\\src\\main\\resources\\Category.txt";
 
-    @Override
-    public List<Category> findAll() {
-        return categories();
+    private List<Category> categories;
+
+    public CategoryRepositoryImpl() {
+        this.categories = categories();
     }
 
     @Override
-    public void delete(Long id) throws CategoryNotFoundException {
-        Category category = findById(id);
-        List<Category> categories = categories();
-        categories.remove(category);
-        List<String[]> data = objToArray(categories);
-        IOUtil.write(data, FILE_PATH);
+    public List<Category> findAll() {
+        return categories;
+    }
+
+    @Override
+    public void delete(Long id) {
+        try {
+            Category category = findById(id);
+            categories.remove(category);
+            List<String[]> data = objToArray(categories);
+            IOUtil.write(data, FILE_PATH);
+        } catch (CategoryNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     @Override
     public Category findById(Long id) throws CategoryNotFoundException {
-        return categories().stream()
-                .filter(c -> c.getId().equals(id)).findAny().orElseThrow(() -> new CategoryNotFoundException(id));
+        return categories.stream()
+                .filter(c -> c.getId().equals(id)).findAny().orElseThrow(() -> new CategoryNotFoundException("Category with id: " + id + " not found"));
     }
 
     @Override
-    public Category save(Category category) throws CategoryNotFoundException {
-        List<Category> categories = categories();
-        if (category.isNew()) {
-            if (categories.size() != 0) {
-                categories.sort(Comparator.comparing(AbstractIdentifiable::getId));
-                Long lastId = categories.get(categories.size() - 1).getId();
-                category.setId(lastId + 1);
-            } else category.setId(1L);
-            categories.add(category);
-        } else {
+    public Category create(Category category) {
+        long lastId = categories.stream().mapToLong(AbstractIdentifiable::getId).max().orElse(0);
+        category.setId(++lastId);
+        categories.add(category);
+        List<String[]> data = objToArray(categories);
+        IOUtil.write(data, FILE_PATH);
+        return category;
+    }
+
+    @Override
+    public Category update(Category category) {
+        try {
             Category old = findById(category.getId());
             int index = categories.indexOf(old);
             categories.set(index, category);
+            List<String[]> data = objToArray(categories);
+            IOUtil.write(data, FILE_PATH);
+        } catch (CategoryNotFoundException e) {
+            System.err.println(e.toString());
         }
-        List<String[]> data = objToArray(categories);
-        IOUtil.write(data, FILE_PATH);
-
         return category;
     }
 

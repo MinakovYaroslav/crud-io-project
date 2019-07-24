@@ -6,9 +6,11 @@ public interface GenericRepository<T, ID> {
 
     List<T> findAll();
 
-    void delete(ID id) throws Throwable;
+    void delete(ID id);
 
     T findById(ID id) throws Throwable;
 
-    T save(T t) throws Throwable;
+    T create(T t);
+
+    T update(T t);
 }

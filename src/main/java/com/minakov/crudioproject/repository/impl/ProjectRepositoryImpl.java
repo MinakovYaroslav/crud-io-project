@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 public class ProjectRepositoryImpl implements ProjectRepository {
 
-    private static final String FILE_PATH = "";
+    private static final String FILE_PATH = "C:\\projects\\crud-io-project\\src\\main\\resources\\Projects.txt";
 
     private List<Project> projects;
 
@@ -26,33 +26,55 @@ public class ProjectRepositoryImpl implements ProjectRepository {
 
     @Override
     public List<Project> findAll() {
-        return projects();
+        return projects;
     }
 
     @Override
-    public void delete(Long id) throws ProjectNotFoundException {
-        Project project = findById(id);
-        projects.remove(project);
-        List<String[]> data = objToArray(projects);
-        IOUtil.write(data, FILE_PATH);
+    public void delete(Long id) {
+        try {
+            Project project = findById(id);
+            project.setStatus(ProjectStatus.DELETED);
+            int index = projects.indexOf(project);
+            projects.set(index, project);
+            List<String[]> data = objToArray(projects);
+            IOUtil.write(data, FILE_PATH);
+        } catch (ProjectNotFoundException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     @Override
     public Project findById(Long id) throws ProjectNotFoundException {
         return projects.stream()
-                .filter(p -> p.getId().equals(id)).findAny().orElseThrow(() -> new ProjectNotFoundException(id));
+                .filter(p -> p.getId().equals(id)).findAny().orElseThrow(() -> new ProjectNotFoundException("Project with id: " + id + " not found"));
     }
 
     @Override
-    public Project save(Project project) throws ProjectNotFoundException {
-        if (project.isNew()) {
-            long lastId = projects.stream().mapToLong(AbstractIdentifiable::getId).max().getAsLong();
-            project.setId(lastId + 1);
+    public Project create(Project project) {
+        try {
+            if (project.getCustomer() == null) throw new CustomerNotFoundException("Customer not found!");
+            if (project.getCategories().isEmpty()) throw new CategoryNotFoundException("Category not found!");
+            long lastId = projects.stream().mapToLong(AbstractIdentifiable::getId).max().orElse(0);
+            project.setId(++lastId);
             projects.add(project);
-        } else {
+            List<String[]> data = objToArray(projects);
+            IOUtil.write(data, FILE_PATH);
+        } catch (CategoryNotFoundException | CustomerNotFoundException e) {
+            System.err.println("Creation failed: " + e.toString());
+        }
+        return project;
+    }
+
+    @Override
+    public Project update(Project project) {
+        try {
             Project old = findById(project.getId());
             int index = projects.indexOf(old);
             projects.set(index, project);
+            List<String[]> data = objToArray(projects);
+            IOUtil.write(data, FILE_PATH);
+        } catch (ProjectNotFoundException e) {
+            System.err.println(e.getMessage());
         }
         return project;
     }
@@ -64,22 +86,23 @@ public class ProjectRepositoryImpl implements ProjectRepository {
         List<Project> projects = new ArrayList<>();
         for (String[] fields : data) {
             try {
-                Long id = Long.valueOf(fields[0]);
-                String name = fields[1];
                 ProjectStatus status = ProjectStatus.valueOf(fields[2]);
-                String[] categoriesArray = fields[3].split(",");
-                Set<Category> categories = new HashSet<>();
-                for (String c : categoriesArray) {
-                    categories.add(categoryRepository.findById(Long.valueOf(c)));
+                if (status == ProjectStatus.ACTIVE) {
+                    Long id = Long.valueOf(fields[0]);
+                    String name = fields[1];
+                    String[] categoriesArray = fields[3].split(",");
+                    Set<Category> categories = new HashSet<>();
+                    for (String c : categoriesArray) {
+                        categories.add(categoryRepository.findById(Long.valueOf(c)));
+                    }
+                    Customer customer = customerRepository.findById(Long.valueOf(fields[4]));
+                    projects.add(new Project(id, name, status, categories, customer));
                 }
-                Customer customer = customerRepository.findById(Long.valueOf(fields[4]));
-                projects.add(new Project(id, name, status, categories, customer));
 
             } catch (CategoryNotFoundException | CustomerNotFoundException e) {
                 System.err.println("Error with parsing " + Arrays.toString(fields));
-                System.err.println(e.getMessage());
+                System.err.println(e.toString());
             }
-
         }
         return projects;
     }

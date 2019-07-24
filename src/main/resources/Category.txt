@@ -1,0 +1,4 @@
+2;Ecology
+4;Java
+5;Education
+6;Cars

@@ -1,0 +1,2 @@
+1;Tesla;ACTIVE;2,6;1
+2;SpaceX;ACTIVE;3;1
